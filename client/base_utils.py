@@ -7,7 +7,7 @@ Convenience functions for use by tests or whomever.
 Note that this file is mixed in by utils.py - note very carefully the
 precedence order defined there
 """
-import commands
+import subprocess
 import fnmatch
 import logging
 import os
@@ -558,7 +558,7 @@ def cpu_online_map():
 
 
 def check_glibc_ver(ver):
-    glibc_ver = commands.getoutput('ldd --version').splitlines()[0]
+    glibc_ver = subprocess.check_output(('ldd', '--version')).splitlines()[0]
     glibc_ver = re.search(r'(\d+\.\d+(\.\d+)?)', glibc_ver).group()
     if utils.compare_versions(glibc_ver, ver) == -1:
         raise error.TestError("Glibc too old (%s). Glibc >= %s is needed." %
@@ -898,9 +898,8 @@ def get_uptime():
     :return: return the uptime of system in secs in float in error case return 'None'
     """
 
-    cmd = "/bin/cat /proc/uptime"
-    (status, output) = commands.getstatusoutput(cmd)
-    if status == 0:
+    try:
+        output = subprocess.check_output(("/bin/cat", "/proc/uptime"))
         return output.split()[0]
-    else:
+    except subprocess.CalledProcessError:
         return None

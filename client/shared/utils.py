@@ -45,7 +45,7 @@ from autotest.client.shared import error, logging_manager
 from autotest.client.shared import progressbar
 from autotest.client.shared.settings import settings
 from autotest.client import os_dep
-import commands
+import subprocess
 import fcntl
 import getpass
 
@@ -2800,7 +2800,7 @@ def kill_process_tree(pid, sig=signal.SIGKILL):
     """
     if not safe_kill(pid, signal.SIGSTOP):
         return
-    children = commands.getoutput("ps --ppid=%d -o pid=" % pid).split()
+    children = subprocess.check_output(("ps", "--ppid=%d" % pid, "-o", "pid=")).split()
     for child in children:
         kill_process_tree(int(child), sig)
     safe_kill(pid, sig)
@@ -3051,8 +3051,9 @@ def get_full_pci_id(pci_id):
     :param pci_id: PCI ID of a device.
     """
     cmd = "lspci -D | awk '/%s/ {print $1}'" % pci_id
-    status, full_id = commands.getstatusoutput(cmd)
-    if status != 0:
+    try:
+        full_id = subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError:
         return None
     return full_id
 
@@ -3064,7 +3065,7 @@ def get_vendor_from_pci_id(pci_id):
     :param pci_id: PCI ID of a device.
     """
     cmd = "lspci -n | awk '/%s/ {print $3}'" % pci_id
-    return re.sub(":", " ", commands.getoutput(cmd))
+    return re.sub(":", " ", subprocess.check_output(cmd, shell=True))
 
 
 def parallel(targets):
