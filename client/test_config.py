@@ -8,7 +8,7 @@ import re
 import string
 import types
 from ConfigParser import ConfigParser
-from StringIO import StringIO
+from io import StringIO
 from os import path
 
 from autotest.client.shared import utils

@@ -11,7 +11,7 @@ inheritance with, just a collection of static methods.
 #
 # Copyright 2008 Google Inc. Released under the GPL v2
 
-import StringIO
+import io
 import glob
 import logging
 import os
@@ -191,14 +191,14 @@ class AsyncJob(BgJob):
             self.stdin_thread.start()
 
         self.stdout_lock = Lock()
-        self.stdout_file = StringIO.StringIO()
+        self.stdout_file = io.StringIO()
         self.stdout_thread = Thread(target=AsyncJob._fd_drainer, name=("%s-stdout" % command),
                                     args=(self.sp.stdout, [self.stdout_file, self.stdout_tee],
                                           self.stdout_lock))
         self.stdout_thread.daemon = True
 
         self.stderr_lock = Lock()
-        self.stderr_file = StringIO.StringIO()
+        self.stderr_file = io.StringIO()
         self.stderr_thread = Thread(target=AsyncJob._fd_drainer, name=("%s-stderr" % command),
                                     args=(self.sp.stderr, [self.stderr_file, self.stderr_tee],
                                           self.stderr_lock))
@@ -1031,7 +1031,7 @@ def join_bg_jobs(bg_jobs, timeout=None):
     """
     ret, timeout_error = 0, False
     for bg_job in bg_jobs:
-        bg_job.output_prepare(StringIO.StringIO(), StringIO.StringIO())
+        bg_job.output_prepare(io.StringIO(), io.StringIO())
 
     try:
         # We are holding ends to stdin, stdout pipes

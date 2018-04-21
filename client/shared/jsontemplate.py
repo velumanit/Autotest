@@ -37,7 +37,7 @@ __all__ = [
     'TemplateSyntaxError', 'UndefinedVariable', 'CompileTemplate', 'FromString',
     'FromFile', 'Template', 'expand']
 
-import StringIO
+import io
 import pprint
 import re
 
@@ -962,7 +962,7 @@ _OPTION_NAMES = ['meta', 'format-char', 'default-formatter', 'undefined-str']
 def FromString(s, more_formatters=lambda x: None, _constructor=None):
     """Like FromFile, but takes a string."""
 
-    f = StringIO.StringIO(s)
+    f = io.StringIO(s)
     return FromFile(f, more_formatters=more_formatters, _constructor=_constructor)
 
 
